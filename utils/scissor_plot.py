@@ -46,6 +46,7 @@ def controllability(M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025_c
 
 def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025_c_w, S_h, A_h, tr_h, l_h, sw_025_c_h, ht_h,
                  b_f_b_w, SM):
+
     x_cg = np.linspace(0, 20, 1000)
 
     Sh_S_stab = stability(M_c, b_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, SM)
