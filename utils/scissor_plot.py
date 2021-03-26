@@ -19,8 +19,10 @@ def stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw
     # # derivative of e over alpha
     deda = wing_downwash_gradient(ht_h, l_h, b_w, A_w, tr_w, sw_025_c_w, M_c)
 
+    #x_mac_le = x_MAC_leading_edge_loc(sw_025_c_w, tr_w, A_w, b_w)
+
     Sh_S = (x_cg - x_ac - SM)/(CLa_h/CLa_A_h*(1-deda)*l_h/MAC*vh_v**2)
-    print(x_cg - x_ac - SM)
+
     return Sh_S
 
 
