@@ -30,12 +30,28 @@ def root_chord(surface_area, wingspan, taper_ratio):
     return cr
 
 
+def any_chord(surface_area, wingspan, taper_ratio, position_wrt_center):
+
+    cr = root_chord(surface_area, wingspan, taper_ratio)
+    ct = cr * taper_ratio
+
+    return cr - (2 * (cr - ct)) / (wingspan) * position_wrt_center
+
+
 def net_wing_surface_area(surface_area_wing, wingspan_wing, taper_ratio_wing, fuselage_width):
 
     cr = root_chord(surface_area_wing, wingspan_wing, taper_ratio_wing)
     net_surface = surface_area_wing - cr * fuselage_width
 
     return net_surface
+
+
+def surface_area_part_wing(surface_area, wingspan, taper_ratio, position_from_root_chord, fuselage_width):
+
+    cr = root_chord(surface_area, wingspan, taper_ratio)
+    c_other = any_chord(surface_area, wingspan, taper_ratio, position_from_root_chord+fuselage_width/2)
+
+    return (cr + c_other) / 2 * position_from_root_chord
 
 
 def m_tv_ratio(tail_height, wingspan):          # Computed assuming that the root chord of the wing
@@ -108,38 +124,61 @@ def wing_downwash_gradient(tail_height, tail_arm, wingspan, aspect_ratio_wing,
 
 
 # Moment coefficients
-def aircraft_aerodynamic_pitching_moment_wing():
+def aircraft_aerodynamic_pitching_moment_wing(aspect_ratio_wing, sweep_quarter_chord_wing):
 
-    return 1
+    Cm_0 = 0.2      # CHANGE
+
+    Cm_ac_w = Cm_0 * (aspect_ratio_wing * np.cos(sweep_quarter_chord_wing) * np.cos(sweep_quarter_chord_wing)) / \
+                     (aspect_ratio_wing + 2 * np.cos(sweep_quarter_chord_wing))
+
+    return Cm_ac_w
 
 
-def aircraft_aerodynamic_pitching_moment_flaps():
+def aircraft_aerodynamic_pitching_moment_flaps(A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, b_f_b_w, x_ac):
 
     # Triple-slotted Fowler flaps, landing setting: d_f = 33 [deg]
-    dc_cf = 0.7
-    # c_prime = MAC + dc
-    # cf_c_prime =
+    # dc_cf = 0.7
+    # cf = 0.9543235602       # Computed from the area and span of the flaps
+    dc = 0.6680265
+    c_prime = MAC + dc
+    # cf_c_prime = 0.24864955
+    c_prime_c = c_prime / MAC
 
-    # Coefficients
-    mu_1 = 0            # NOT FOUND YET
-    mu_2 = 1
+    # Coefficients (found by using the data above)
+    mu_1 = 0.215
+    mu_2 = 1.05
     mu_3 = 0.035
 
-    # CL = lift_coefficient(W_l, V_e_l, S_w)
+    dcl_max = 1.9 * c_prime_c
+    CL_l = 3.43
 
-    return 1
+    S_wf = surface_area_part_wing(S_w, b_w, tr_w, b_f_b_w*b_f/2, b_f)
+
+    Cm_025_c = mu_2 * (-mu_1 * dcl_max * c_prime_c - (CL_l + dcl_max * (1-S_wf/S_w)) * c_prime_c/8 * (c_prime_c-1)) + \
+               0.7 * (A_w / (1 + 2/A_w)) * mu_3 * dcl_max * np.tan(sw_025_c_w)
+
+    Cm_ac_f = Cm_025_c - CL_l * (0.25 - x_ac / MAC)
+
+    return Cm_ac_f
 
 
-def aircraft_aerodynamic_pitching_moment_fuselage():
+def aircraft_aerodynamic_pitching_moment_fuselage(M, A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, h_f, l_f):
 
-    return 1
+    sw_05_c_w = sweep_half_chord(sw_025_c_w, A_w, tr_w)
+
+    CL_0 = 0.6          # Obtained from comparison with other aircraft
+    CLa_A_h = alpha_lift_coefficient_aircraft_minus_tail(M, A_w, sw_05_c_w, S_w, b_w, tr_w, b_f)
+
+    Cm_ac_fus = -1.8 * (1 - 2.5*b_f / l_f) * ((np.pi * b_f * h_f * l_f * CL_0) / (4 * S_w * MAC * CLa_A_h))
+
+    return Cm_ac_fus
 
 
-def aircraft_aerodynamic_pitching_moment():
+def aircraft_aerodynamic_pitching_moment(M, A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, h_f, l_f, b_f_b_w, x_ac):
 
-    Cm_ac_w = aircraft_aerodynamic_pitching_moment_wing()
-    Df_Cm_ac = aircraft_aerodynamic_pitching_moment_flaps()
-    Dfus_Cm_ac = aircraft_aerodynamic_pitching_moment_flaps()
+    Cm_ac_w = aircraft_aerodynamic_pitching_moment_wing(A_w, sw_025_c_w)
+    Df_Cm_ac = aircraft_aerodynamic_pitching_moment_flaps(A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, b_f_b_w, x_ac)
+    Dfus_Cm_ac = aircraft_aerodynamic_pitching_moment_fuselage(M, A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, h_f, l_f)
 
     Cm_ac = Cm_ac_w + Df_Cm_ac + Dfus_Cm_ac
 
