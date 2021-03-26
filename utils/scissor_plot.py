@@ -7,7 +7,7 @@ from general import *
 SM = 0.05  # Safety margin of a 5%
 
 
-def stability(M_c, b_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, SM):
+def stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, SM, MAC, vh_v):
     sw_05_c_h = sweep_half_chord(sw_025_c_h, A_h, tr_h)
     sw_05_c_w = sweep_half_chord(sw_025_c_w, A_w, tr_w)
 
@@ -15,10 +15,11 @@ def stability(M_c, b_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_
     # C_La_A_h computation
     CLa_A_h = alpha_lift_coefficient_aircraft_minus_tail(M_c, A_w, sw_05_c_w, S_w, b_w, tr_w, b_f)
 
+    x_ac = x_aerodynamic_center(b_f, h_f, S_w, MAC, S_w, b_w, tr_w, sw_025_c_w, CLa_A_h)
     # # derivative of e over alpha
     deda = wing_downwash_gradient(ht_h, l_h, b_w, A_w, tr_w, sw_025_c_w, M_c)
 
-    Sh_S = np.ones(x_cg.shape) - SM
+    Sh_S = (x_cg - x_ac - SM)/(CLa_h/CLa_A_h*(1-deda)*l_h/MAC*vh_v**2)
 
     return Sh_S
 
@@ -34,7 +35,7 @@ def controllability(M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025_c
 
     CLa_A_h = alpha_lift_coefficient_aircraft_minus_tail(M_l, A_w, sw_05_c_w, S_w, b_w, tr_w, b_f)
 
-    x_ac = 8 # Change
+    x_ac = x_aerodynamic_center(b_f, h_f, S_w, MAC, S_w, b_w, tr_w, sw_025_c_w, CLa_A_h)
 
     Cm_ac = aircraft_aerodynamic_pitching_moment(M_l, A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, h_f, l_f, b_f_b_w, x_ac)
 
@@ -49,16 +50,16 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
 
     x_cg = np.linspace(0, 20, 1000)
 
-    Sh_S_stab = stability(M_c, b_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, SM)
-    Sh_S_stab_SM0 = stability(M_c, b_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, 0)
+    Sh_S_stab = stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, SM, MAC, Vh_V)
+    Sh_S_stab_SM0 = stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, 0, MAC, Vh_V)
 
     Sh_S_control = controllability(M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025_c_w, S_h, A_h, tr_h, l_h,
                                    sw_025_c_h, ht_h, b_f_b_w, x_cg)
 
     plt.figure(figsize=(5, 5))
-    plt.plot(x_cg / MAC, Sh_S_stab)
-    plt.plot(x_cg / MAC, Sh_S_stab_SM0)
-    plt.plot(x_cg / MAC, Sh_S_control)
+    plt.plot(x_cg / MAC, Sh_S_stab,label= "Sh_S_stab" )
+    plt.plot(x_cg / MAC, Sh_S_stab_SM0, label= "Sh_S_stab_SM0")
+    plt.plot(x_cg / MAC, Sh_S_control, label= "Sh_S_control")
 
     plt.grid(color='lightgray', linestyle='dashdot')
 
@@ -70,6 +71,9 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
     plt.ylabel(r'$\frac{S_h}{S}$ [-]', fontsize=15)
     plt.yticks(fontsize=12)
 
+    plt.legend()
+
     plt.tight_layout()
     plt.show()
     plt.close()
+

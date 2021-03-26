@@ -1,6 +1,7 @@
 from utils.general import *
 from scissor_plot import scissor_plot
-
+import numpy as np
+from math import *
 """ Geometric parameters of the BAe Avro RJ85 """
 
 #fuselage
@@ -24,6 +25,7 @@ tr_h = 0.41 #Taper ratio horizontal wing
 sweep_025_c_h = np.radians(20)  #[rad]
 l_h = 12.35
 vh_v = 1        #T tail configuration
+
 tail_height = 4.85
 
 # Flaps
@@ -32,9 +34,10 @@ b_f_b_w = 0.78
 v_c = 404        #cruise speed,  Max cruise speed 430 [kts]
 v_l = 125
 
-M_c = mach_number_cruise(v_c*0.5144444)
+M_c = 0.68
 M_l = mach_number_landing(v_l*0.5144444)
 
+#print(sqrt(1-M_c**2)*A_w,sqrt(1-M_l**2)*A_w)
 x_ac = 1        #location of aerodynamic center
 
 # Coefficients
