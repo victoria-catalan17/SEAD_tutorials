@@ -20,7 +20,7 @@ def stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw
     deda = wing_downwash_gradient(ht_h, l_h, b_w, A_w, tr_w, sw_025_c_w, M_c)
 
     Sh_S = (x_cg - x_ac - SM)/(CLa_h/CLa_A_h*(1-deda)*l_h/MAC*vh_v**2)
-
+    print(x_cg - x_ac - SM)
     return Sh_S
 
 
@@ -57,7 +57,7 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
                                    sw_025_c_h, ht_h, b_f_b_w, x_cg)
 
     plt.figure(figsize=(5, 5))
-    plt.plot(x_cg / MAC, Sh_S_stab,label= "Sh_S_stab" )
+    plt.plot(x_cg / MAC, Sh_S_stab, label= "Sh_S_stab" )
     plt.plot(x_cg / MAC, Sh_S_stab_SM0, label= "Sh_S_stab_SM0")
     plt.plot(x_cg / MAC, Sh_S_control, label= "Sh_S_control")
 
@@ -66,10 +66,12 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
     # x-axis
     plt.xlabel(r'$\frac{x_{cg}}{MAC}$ [-]', fontsize=15)
     plt.xticks(fontsize=12)
+    plt.xlim([0, 0.8])
 
     # y-axis
     plt.ylabel(r'$\frac{S_h}{S}$ [-]', fontsize=15)
     plt.yticks(fontsize=12)
+    plt.ylim([0, 0.5])
 
     plt.legend()
 
