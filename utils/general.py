@@ -68,10 +68,13 @@ def tail_volume_coefficient(surface_area_tail, surface_area_wing, tail_arm, mean
 
     return (surface_area_tail * tail_arm) / (surface_area_wing * mean_aerodynamic_chord)
 
+
 def x_MAC_leading_edge_loc(sweep_quarter_chord, taper_ratio, aspect_ratio, wingspan_wing):
+
     sweep_LE = np.arctan(np.tan(sweep_quarter_chord) + 4/aspect_ratio*0.25*(1-taper_ratio)/(1+taper_ratio))
     x_t = np.tan(sweep_LE)*wingspan_wing/2
     x_r = 0
+
     return (x_t-x_r)*(1+2*taper_ratio)/(3+3*taper_ratio)
 
 
@@ -129,8 +132,11 @@ def wing_downwash_gradient(tail_height, tail_arm, wingspan, aspect_ratio_wing,
     return deda
 
 
+# AERODYNAMIC CENTER
+
 def x_ac_fuselage_contribution_1(fuselage_width, fuselage_height, S_w, mean_aerodynamic_chord, cla_a_h):
-    l_fn = 10   #nose till leading edge root chord postion
+
+    l_fn = 10   #nose till leading edge root chord position
     x_ac_fuselage_1 = - 1.8/cla_a_h * fuselage_width * fuselage_height * l_fn/(S_w*mean_aerodynamic_chord)
 
     return x_ac_fuselage_1
@@ -174,7 +180,7 @@ def x_aerodynamic_center(fuselage_width, fuselage_height, S_w, mean_aerodynamic_
 # Moment coefficients
 def aircraft_aerodynamic_pitching_moment_wing(aspect_ratio_wing, sweep_quarter_chord_wing):
 
-    Cm_0 = 0.2      # CHANGE
+    Cm_0 = -0.3365992129
 
     Cm_ac_w = Cm_0 * (aspect_ratio_wing * np.cos(sweep_quarter_chord_wing) * np.cos(sweep_quarter_chord_wing)) / \
                      (aspect_ratio_wing + 2 * np.cos(sweep_quarter_chord_wing))
@@ -194,13 +200,13 @@ def aircraft_aerodynamic_pitching_moment_flaps(A_w, sw_025_c_w, S_w, b_w, tr_w, 
 
     # Coefficients (found by using the data above)
     mu_1 = 0.215
-    mu_2 = 1.05
-    mu_3 = 0.035
+    mu_2 = 0.99
+    mu_3 = 0.033
 
     dcl_max = 1.9 * c_prime_c
     CL_l = 3.43
 
-    S_wf = surface_area_part_wing(S_w, b_w, tr_w, b_f_b_w*b_f/2, b_f)
+    S_wf = 2*surface_area_part_wing(S_w, b_w, tr_w, b_f_b_w*b_w/2, b_f)
 
     Cm_025_c = mu_2 * (-mu_1 * dcl_max * c_prime_c - (CL_l + dcl_max * (1-S_wf/S_w)) * c_prime_c/8 * (c_prime_c-1)) + \
                0.7 * (A_w / (1 + 2/A_w)) * mu_3 * dcl_max * np.tan(sw_025_c_w)

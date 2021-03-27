@@ -21,7 +21,7 @@ def stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw
 
     #x_mac_le = x_MAC_leading_edge_loc(sw_025_c_w, tr_w, A_w, b_w)
 
-    Sh_S = (x_cg - x_ac - SM)/(CLa_h/CLa_A_h*(1-deda)*l_h/MAC*vh_v**2)
+    Sh_S = (x_cg - x_ac + SM) / (CLa_h/CLa_A_h*(1-deda)*l_h/MAC*vh_v**2)
 
     return Sh_S
 
@@ -51,6 +51,7 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
                  b_f_b_w, SM):
 
     x_cg = np.linspace(0, 20, 1000)
+    x_cg = (x_cg - x_MAC_leading_edge_loc(sw_025_c_w, tr_w, A_w, b_w)) / MAC
 
     Sh_S_stab = stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, SM, MAC, Vh_V)
     Sh_S_stab_SM0 = stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, 0, MAC, Vh_V)
@@ -58,12 +59,10 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
     Sh_S_control = controllability(M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025_c_w, S_h, A_h, tr_h, l_h,
                                    sw_025_c_h, ht_h, b_f_b_w, x_cg)
 
-    plt.figure(figsize=(5, 5))
-    plt.plot(x_cg / MAC, Sh_S_stab, label= "Sh_S_stab" )
-    plt.plot(x_cg / MAC, Sh_S_stab_SM0, label= "Sh_S_stab_SM0")
-    plt.plot(x_cg / MAC, Sh_S_control, label= "Sh_S_control")
-
-    plt.grid(color='lightgray', linestyle='dashdot')
+    plt.figure(figsize=(7, 5))
+    plt.plot(x_cg, Sh_S_stab, label= "Stability curve" )
+    plt.plot(x_cg, Sh_S_stab_SM0, label= "Stability curve (SM = 0)")
+    plt.plot(x_cg, Sh_S_control, label= "Controllability curve")
 
     # x-axis
     plt.xlabel(r'$\frac{x_{cg}}{MAC}$ [-]', fontsize=15)
@@ -75,6 +74,7 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
     plt.yticks(fontsize=12)
     plt.ylim([0, 0.5])
 
+    plt.grid(color='lightgray', linestyle='dashdot')
     plt.legend()
 
     plt.tight_layout()
