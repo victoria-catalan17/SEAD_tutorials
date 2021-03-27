@@ -67,12 +67,12 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
     # x-axis
     plt.xlabel(r'$\frac{x_{cg}}{MAC}$ [-]', fontsize=15)
     plt.xticks(fontsize=12)
-    plt.xlim([0, 0.8])
+    plt.xlim([0, 1])
 
     # y-axis
     plt.ylabel(r'$\frac{S_h}{S}$ [-]', fontsize=15)
     plt.yticks(fontsize=12)
-    plt.ylim([0, 0.5])
+    plt.ylim([0, 1])
 
     plt.grid(color='lightgray', linestyle='dashdot')
     plt.legend()

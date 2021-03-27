@@ -75,7 +75,7 @@ def x_MAC_leading_edge_loc(sweep_quarter_chord, taper_ratio, aspect_ratio, wings
     x_t = np.tan(sweep_LE)*wingspan_wing/2
     x_r = 0
 
-    return (x_t-x_r)*(1+2*taper_ratio)/(3+3*taper_ratio)
+    return (x_t-x_r)*(1+2*taper_ratio)/(3+3*taper_ratio) + 10 - 0.7491052114    # Got this with x_t = b_f/2
 
 
 #COEFFICIENTS
