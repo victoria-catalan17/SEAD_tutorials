@@ -63,6 +63,8 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
     plt.plot(x_cg, Sh_S_stab, label= "Stability curve" )
     plt.plot(x_cg, Sh_S_stab_SM0, label= "Stability curve (SM = 0)")
     plt.plot(x_cg, Sh_S_control, label= "Controllability curve")
+    plt.axvline(0.556)
+    plt.axvline(0.3616)
 
     if original_design:
         plt.plot(np.linspace(0,1,10), np.ones(10)*0.202, label= r"$\frac{S_h}{S}$ for the BAe Avro RJ85")

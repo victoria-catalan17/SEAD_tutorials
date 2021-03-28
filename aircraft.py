@@ -4,7 +4,7 @@ import numpy as np
 from math import *
 """ Geometric parameters of the BAe Avro RJ85 """
 
-original_design = False
+original_design = True
 
 if original_design == True:
 
@@ -55,9 +55,9 @@ else:
     S_w = 77.3
     b_w = 28.1071                           # Changes when increasing the aspect ratio
     A_w = 8.89*1.15                         # Design modification
-    tr_w = 0.356                            # Taper ratio main wing
+    tr_w = 0.2645                           # changes as the root chord stays the same
     sweep_025_c_w = np.radians(15)          # [rad]
-    MAC = 2.95697                           # Changes as the span increases and the surface area is kept constant
+    MAC = 3.06036                           # Changes as the span increases and the surface area is kept constant
 
     #horizontal tail plane
     S_h = 15.61
