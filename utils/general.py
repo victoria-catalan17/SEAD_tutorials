@@ -211,7 +211,7 @@ def aircraft_aerodynamic_pitching_moment_flaps(A_w, sw_025_c_w, S_w, b_w, tr_w, 
     Cm_025_c = mu_2 * (-mu_1 * dcl_max * c_prime_c - (CL_l + dcl_max * (1-S_wf/S_w)) * c_prime_c/8 * (c_prime_c-1)) + \
                0.7 * (A_w / (1 + 2/A_w)) * mu_3 * dcl_max * np.tan(sw_025_c_w)
 
-    Cm_ac_f = Cm_025_c - CL_l * (0.25 - x_ac / MAC)
+    Cm_ac_f = Cm_025_c - CL_l * (0.25 - x_ac)
 
     return Cm_ac_f
 
