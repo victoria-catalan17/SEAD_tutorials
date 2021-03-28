@@ -51,7 +51,7 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
                  b_f_b_w, SM, original_design):
 
     x_cg = np.linspace(0, 20, 1000)
-    x_cg = (x_cg - x_MAC_leading_edge_loc(sw_025_c_w, tr_w, A_w, b_w)) / MAC
+    x_cg = (x_cg - x_MAC_leading_edge_loc(S_w, sw_025_c_w, tr_w, A_w, b_w, MAC)) / MAC
 
     Sh_S_stab = stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, SM, MAC, Vh_V)
     Sh_S_stab_SM0 = stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw_025_c_h, ht_h, x_cg, 0, MAC, Vh_V)

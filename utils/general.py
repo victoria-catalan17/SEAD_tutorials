@@ -69,13 +69,13 @@ def tail_volume_coefficient(surface_area_tail, surface_area_wing, tail_arm, mean
     return (surface_area_tail * tail_arm) / (surface_area_wing * mean_aerodynamic_chord)
 
 
-def x_MAC_leading_edge_loc(sweep_quarter_chord, taper_ratio, aspect_ratio, wingspan_wing):
+def x_MAC_leading_edge_loc(surface_area, sweep_quarter_chord, taper_ratio, aspect_ratio, wingspan_wing, MAC):
 
     sweep_LE = np.arctan(np.tan(sweep_quarter_chord) + 4/aspect_ratio*0.25*(1-taper_ratio)/(1+taper_ratio))
-    x_t = np.tan(sweep_LE)*wingspan_wing/2
-    x_r = 0
+    cr = root_chord(surface_area, wingspan_wing, taper_ratio)
+    x_t = (cr - MAC) * wingspan_wing / (cr * (1 - taper_ratio) * 2)
 
-    return (x_t-x_r)*(1+2*taper_ratio)/(3+3*taper_ratio) + 10 - 0.7491052114    # Got this with x_t = b_f/2
+    return np.tan(sweep_LE)*x_t + 10 - 0.7491052114    # Got this with x_t = b_f/2
 
 
 #COEFFICIENTS
