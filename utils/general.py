@@ -128,7 +128,7 @@ def wing_downwash_gradient(tail_height, tail_arm, wingspan, aspect_ratio_wing,
     deda = (k_e_sweep / k_e_sweep0) * (r / (r*r + m_tv*m_tv) * 0.4876 / np.sqrt(r*r + 0.6319 + m_tv*m_tv) +
                                        (1 + ((r*r) / (r*r + 0.7915 + 5.0734 * m_tv*m_tv))**0.3113) *
                                        (1 - np.sqrt((m_tv*m_tv) / (1 + m_tv*m_tv)))) * cla_w / (np.pi*aspect_ratio_wing)
-
+    #print(k_e_sweep,k_e_sweep0,r,m_tv)
     return deda
 
 
@@ -138,7 +138,6 @@ def x_ac_fuselage_contribution_1(fuselage_width, fuselage_height, S_w, mean_aero
 
     l_fn = 10   #nose till leading edge root chord position
     x_ac_fuselage_1 = - 1.8/cla_a_h * fuselage_width * fuselage_height * l_fn/(S_w*mean_aerodynamic_chord)
-
     return x_ac_fuselage_1
 
 
@@ -175,14 +174,15 @@ def x_ac_nacelles_contribution(wingspan_wing, taper_ratio_wing, surface_area_win
         l_n1 = 0.25*mean_aerodynamic_chord + (MAC_y-wingspan_wing/2*engine_1_percentage_Y)*np.tan(sweep_quarter_chord) + 2.6
 
         x_ac_nacelles = 2*k_n*b_n**2*l_n1/(surface_area_wing*mean_aerodynamic_chord*cla_a_h)
-
     return x_ac_nacelles
 
 
 def x_aerodynamic_center(fuselage_width, fuselage_height, S_w, mean_aerodynamic_chord, surface_area_wing,
                          wingspan_wing, taper_ratio_wing, sweep_quarter_chord, cla_a_h, original_design):
-
-    x_ac_wing = 0.26        #/MAC
+    if original_design:
+        x_ac_wing = 0.26        #/MAC
+    else:
+        x_ac_wing = 0.29        #/MAC
     x_ac = x_ac_wing + x_ac_fuselage_contribution_1(fuselage_width, fuselage_height, S_w, mean_aerodynamic_chord, cla_a_h)\
            + x_ac_fuselage_contribution_2(surface_area_wing, wingspan_wing, taper_ratio_wing, fuselage_width,
                                           mean_aerodynamic_chord, sweep_quarter_chord)\

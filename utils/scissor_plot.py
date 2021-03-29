@@ -13,10 +13,12 @@ def stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw
     sw_05_c_w = sweep_half_chord(sw_025_c_w, A_w, tr_w)
 
     CLa_h = alpha_lift_coefficient(M_c, A_h, sw_05_c_h)
+
     # C_La_A_h computation
     CLa_A_h = alpha_lift_coefficient_aircraft_minus_tail(M_c, A_w, sw_05_c_w, S_w, b_w, tr_w, b_f)
 
     x_ac = x_aerodynamic_center(b_f, h_f, S_w, MAC, S_w, b_w, tr_w, sw_025_c_w, CLa_A_h, original_design)
+
     # # derivative of e over alpha
     deda = wing_downwash_gradient(ht_h, l_h, b_w, A_w, tr_w, sw_025_c_w, M_c)
 

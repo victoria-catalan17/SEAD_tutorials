@@ -4,7 +4,7 @@ import numpy as np
 from math import *
 """ Geometric parameters of the BAe Avro RJ85 """
 
-original_design = False
+original_design = True
 
 if original_design == True:
 
@@ -78,7 +78,7 @@ else:
 
     M_c = 0.68
     M_l = mach_number_landing(v_l*0.514444)
-
+    print(M_l)
     # Coefficients
     CL_max_l = 3.62
 
