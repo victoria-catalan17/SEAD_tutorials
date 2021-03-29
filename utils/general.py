@@ -151,29 +151,38 @@ def x_ac_fuselage_contribution_2(surface_area_wing, wingspan_wing, taper_ratio_w
 
 
 def x_ac_nacelles_contribution(wingspan_wing, taper_ratio_wing, surface_area_wing, mean_aerodynamic_chord,
-                               sweep_quarter_chord, cla_a_h):
-    k_n = -4
-    b_n = 1.40      #Nacelle width
-    MAC_y = wingspan_wing/2*(1 + 2*taper_ratio_wing)/(3 + 3*taper_ratio_wing)       #MAC y location
-    engine_1_percentage_Y = 0.315       # engine y location
-    engine_2_percentage_Y = 0.5         # engine y location
-    l_n1 = 0.25*mean_aerodynamic_chord + (MAC_y-wingspan_wing/2*engine_1_percentage_Y)*np.tan(sweep_quarter_chord) + 2.6
-    l_n2 = 0.25*mean_aerodynamic_chord + (MAC_y-wingspan_wing/2*engine_2_percentage_Y)*np.tan(sweep_quarter_chord) + 2.6
+                               sweep_quarter_chord, cla_a_h, original_design):
+    if original_design == True:
+        k_n = -4
+        b_n = 1.40      #Nacelle width
+        MAC_y = wingspan_wing/2*(1 + 2*taper_ratio_wing)/(3 + 3*taper_ratio_wing)       #MAC y location
+        engine_1_percentage_Y = 0.315       # engine y location
+        engine_2_percentage_Y = 0.5         # engine y location
+        l_n1 = 0.25*mean_aerodynamic_chord + (MAC_y-wingspan_wing/2*engine_1_percentage_Y)*np.tan(sweep_quarter_chord) + 2.6
+        l_n2 = 0.25*mean_aerodynamic_chord + (MAC_y-wingspan_wing/2*engine_2_percentage_Y)*np.tan(sweep_quarter_chord) + 2.6
 
-    x_ac_nacelles = 2*k_n*b_n**2*l_n1/(surface_area_wing*mean_aerodynamic_chord*cla_a_h)\
-                   + 2*k_n*b_n**2*l_n2/(surface_area_wing*mean_aerodynamic_chord*cla_a_h)
+        x_ac_nacelles = 2*k_n*b_n**2*l_n1/(surface_area_wing*mean_aerodynamic_chord*cla_a_h)\
+                       + 2*k_n*b_n**2*l_n2/(surface_area_wing*mean_aerodynamic_chord*cla_a_h)
+    else:
+        k_n = -4
+        b_n = 1.40*1.15      #Nacelle width
+        MAC_y = wingspan_wing/2*(1 + 2*taper_ratio_wing)/(3 + 3*taper_ratio_wing)       #MAC y location
+        engine_1_percentage_Y = 0.315       # engine y location
+        l_n1 = 0.25*mean_aerodynamic_chord + (MAC_y-wingspan_wing/2*engine_1_percentage_Y)*np.tan(sweep_quarter_chord) + 2.6
 
+        x_ac_nacelles = 2*k_n*b_n**2*l_n1/(surface_area_wing*mean_aerodynamic_chord*cla_a_h)
+    print(x_ac_nacelles)
     return x_ac_nacelles
 
 
 def x_aerodynamic_center(fuselage_width, fuselage_height, S_w, mean_aerodynamic_chord, surface_area_wing,
-                         wingspan_wing, taper_ratio_wing, sweep_quarter_chord, cla_a_h):
+                         wingspan_wing, taper_ratio_wing, sweep_quarter_chord, cla_a_h, original_design):
     x_ac_wing = 0.26        #/MAC
     x_ac = x_ac_wing + x_ac_fuselage_contribution_1(fuselage_width, fuselage_height, S_w, mean_aerodynamic_chord, cla_a_h)\
            + x_ac_fuselage_contribution_2(surface_area_wing, wingspan_wing, taper_ratio_wing, fuselage_width,
                                           mean_aerodynamic_chord, sweep_quarter_chord)\
            + x_ac_nacelles_contribution(wingspan_wing, taper_ratio_wing, surface_area_wing, mean_aerodynamic_chord,
-                                        sweep_quarter_chord, cla_a_h)
+                                        sweep_quarter_chord, cla_a_h, original_design)
     return x_ac
 
 

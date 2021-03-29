@@ -4,7 +4,7 @@ import numpy as np
 from math import *
 """ Geometric parameters of the BAe Avro RJ85 """
 
-original_design = True
+original_design = False
 
 if original_design == True:
 
