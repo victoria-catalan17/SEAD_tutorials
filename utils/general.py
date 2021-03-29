@@ -152,7 +152,9 @@ def x_ac_fuselage_contribution_2(surface_area_wing, wingspan_wing, taper_ratio_w
 
 def x_ac_nacelles_contribution(wingspan_wing, taper_ratio_wing, surface_area_wing, mean_aerodynamic_chord,
                                sweep_quarter_chord, cla_a_h, original_design):
-    if original_design == True:
+
+    if original_design:
+
         k_n = -4
         b_n = 1.40      #Nacelle width
         MAC_y = wingspan_wing/2*(1 + 2*taper_ratio_wing)/(3 + 3*taper_ratio_wing)       #MAC y location
@@ -163,7 +165,9 @@ def x_ac_nacelles_contribution(wingspan_wing, taper_ratio_wing, surface_area_win
 
         x_ac_nacelles = 2*k_n*b_n**2*l_n1/(surface_area_wing*mean_aerodynamic_chord*cla_a_h)\
                        + 2*k_n*b_n**2*l_n2/(surface_area_wing*mean_aerodynamic_chord*cla_a_h)
+
     else:
+
         k_n = -4
         b_n = 1.40*1.15      #Nacelle width
         MAC_y = wingspan_wing/2*(1 + 2*taper_ratio_wing)/(3 + 3*taper_ratio_wing)       #MAC y location
@@ -171,18 +175,20 @@ def x_ac_nacelles_contribution(wingspan_wing, taper_ratio_wing, surface_area_win
         l_n1 = 0.25*mean_aerodynamic_chord + (MAC_y-wingspan_wing/2*engine_1_percentage_Y)*np.tan(sweep_quarter_chord) + 2.6
 
         x_ac_nacelles = 2*k_n*b_n**2*l_n1/(surface_area_wing*mean_aerodynamic_chord*cla_a_h)
-    print(x_ac_nacelles)
+
     return x_ac_nacelles
 
 
 def x_aerodynamic_center(fuselage_width, fuselage_height, S_w, mean_aerodynamic_chord, surface_area_wing,
                          wingspan_wing, taper_ratio_wing, sweep_quarter_chord, cla_a_h, original_design):
+
     x_ac_wing = 0.26        #/MAC
     x_ac = x_ac_wing + x_ac_fuselage_contribution_1(fuselage_width, fuselage_height, S_w, mean_aerodynamic_chord, cla_a_h)\
            + x_ac_fuselage_contribution_2(surface_area_wing, wingspan_wing, taper_ratio_wing, fuselage_width,
                                           mean_aerodynamic_chord, sweep_quarter_chord)\
            + x_ac_nacelles_contribution(wingspan_wing, taper_ratio_wing, surface_area_wing, mean_aerodynamic_chord,
                                         sweep_quarter_chord, cla_a_h, original_design)
+
     return x_ac
 
 
@@ -194,23 +200,42 @@ def aircraft_aerodynamic_pitching_moment_wing(aspect_ratio_wing, sweep_quarter_c
     Cm_ac_w = Cm_0 * (aspect_ratio_wing * np.cos(sweep_quarter_chord_wing) * np.cos(sweep_quarter_chord_wing)) / \
                      (aspect_ratio_wing + 2 * np.cos(sweep_quarter_chord_wing))
 
+    print("-------------------Cm_ac WING-------------------")
+    print("Cm_0:         ", Cm_0)
+    print("Cm_ac_wing:   ", Cm_ac_w)
+
     return Cm_ac_w
 
 
-def aircraft_aerodynamic_pitching_moment_flaps(A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, b_f_b_w, x_ac):
+def aircraft_aerodynamic_pitching_moment_flaps(A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, b_f_b_w, x_ac, original_design):
 
-    # Triple-slotted Fowler flaps, landing setting: d_f = 33 [deg]
-    # dc_cf = 0.7
-    # cf = 0.9543235602       # Computed from the area and span of the flaps
-    dc = 0.6680265
-    c_prime = MAC + dc
-    # cf_c_prime = 0.24864955
-    c_prime_c = c_prime / MAC
+    if original_design:
+        # Triple-slotted Fowler flaps, landing setting: d_f = 33 [deg]
+        # dc_cf = 0.7
+        # cf = 0.9543235602       # Computed from the area and span of the flaps
+        dc = 0.6680265
+        c_prime = MAC + dc
+        # cf_c_prime = 0.24864955
+        c_prime_c = c_prime / MAC
 
-    # Coefficients (found by using the data above)
-    mu_1 = 0.215
-    mu_2 = 0.99
-    mu_3 = 0.033
+        # Coefficients (found by using the data above)
+        mu_1 = 0.215
+        mu_2 = 0.99
+        mu_3 = 0.033
+
+    else:
+        # Triple-slotted Fowler flaps, landing setting: d_f = 33 [deg]
+        # dc_cf = 0.7
+        # cf = Sf / (b_f_b_w*b_w) = 0.8899111      # Computed from the area and span of the flaps
+        dc = 0.6229378
+        c_prime = MAC + dc
+        # cf_c_prime = 0.241607
+        c_prime_c = c_prime / MAC
+
+        # Coefficients (found by using the data above)
+        mu_1 = 0.215
+        mu_2 = 1.058
+        mu_3 = 0.028
 
     dcl_max = 1.9 * c_prime_c
     CL_l = 3.43
@@ -221,6 +246,12 @@ def aircraft_aerodynamic_pitching_moment_flaps(A_w, sw_025_c_w, S_w, b_w, tr_w, 
                0.7 * (A_w / (1 + 2/A_w)) * mu_3 * dcl_max * np.tan(sw_025_c_w)
 
     Cm_ac_f = Cm_025_c - CL_l * (0.25 - x_ac)
+
+    print("-------------------Cm_ac FLAPS-------------------")
+    print("x_ac:         ", x_ac)
+    print("Swf:          ", S_wf)
+    print("Cm_1/4:       ", Cm_025_c)
+    print("Cm_ac_flaps:  ", Cm_ac_f)
 
     return Cm_ac_f
 
@@ -234,15 +265,23 @@ def aircraft_aerodynamic_pitching_moment_fuselage(M, A_w, sw_025_c_w, S_w, b_w, 
 
     Cm_ac_fus = -1.8 * (1 - 2.5*b_f / l_f) * ((np.pi * b_f * h_f * l_f * CL_0) / (4 * S_w * MAC * CLa_A_h))
 
+    print("-------------------Cm_ac FLAPS-------------------")
+    print("CL_A-h:        ", CLa_A_h)
+    print("Cm_ac_fuselage:", Cm_ac_fus)
+
     return Cm_ac_fus
 
 
-def aircraft_aerodynamic_pitching_moment(M, A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, h_f, l_f, b_f_b_w, x_ac):
+def aircraft_aerodynamic_pitching_moment(M, A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, h_f, l_f, b_f_b_w, x_ac, original_design):
+
+    print("----------------PITCHING MOMENT COEFFICIENT----------------")
 
     Cm_ac_w = aircraft_aerodynamic_pitching_moment_wing(A_w, sw_025_c_w)
-    Df_Cm_ac = aircraft_aerodynamic_pitching_moment_flaps(A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, b_f_b_w, x_ac)
+    Df_Cm_ac = aircraft_aerodynamic_pitching_moment_flaps(A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, b_f_b_w, x_ac, original_design)
     Dfus_Cm_ac = aircraft_aerodynamic_pitching_moment_fuselage(M, A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, h_f, l_f)
 
     Cm_ac = Cm_ac_w + Df_Cm_ac + Dfus_Cm_ac
+
+    print("---------Cm_ac: ", Cm_ac)
 
     return Cm_ac

@@ -29,6 +29,7 @@ def stability(M_c, b_f, h_f, S_w, A_w, b_w, tr_w, sw_025_c_w, A_h, tr_h, l_h, sw
 
 def controllability(M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025_c_w, S_h, A_h, tr_h, l_h, sw_025_c_h, ht_h,
                     b_f_b_w, x_cg, original_design):
+    print("##### CONTROLLABILITY #####")
     # Geometry
     sw_05_c_w = sweep_half_chord(sw_025_c_w, A_w, tr_w)
     # V_h = tail_volume_coefficient(S_h, S_w, l_h, MAC)
@@ -40,9 +41,15 @@ def controllability(M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025_c
 
     x_ac = x_aerodynamic_center(b_f, h_f, S_w, MAC, S_w, b_w, tr_w, sw_025_c_w, CLa_A_h, original_design)
 
-    Cm_ac = aircraft_aerodynamic_pitching_moment(M_l, A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, h_f, l_f, b_f_b_w, x_ac)
+    Cm_ac = aircraft_aerodynamic_pitching_moment(M_l, A_w, sw_025_c_w, S_w, b_w, tr_w, MAC, b_f, h_f, l_f, b_f_b_w, x_ac, original_design)
 
     Sh_S = (x_cg + (Cm_ac / CL_A_h) - x_ac) / ((CL_h * l_h * Vh_V*Vh_V) / (CL_A_h * MAC))
+
+    print("----------------FINAL VALUES----------------")
+    print("CL_h:                ", CL_h)
+    print("x_ac:                ", x_ac)
+    print("CLa_A-h:             ", CLa_A_h)
+    print("Sh/S for x_cg = 0.4: ", (0.4 + (Cm_ac / CL_A_h) - x_ac) / ((CL_h * l_h * Vh_V*Vh_V) / (CL_A_h * MAC)))
 
     return Sh_S
 
@@ -63,8 +70,6 @@ def scissor_plot(M_c, M_l, Vh_V, b_f, h_f, l_f, S_w, A_w, b_w, tr_w, MAC, sw_025
     plt.plot(x_cg, Sh_S_stab, label= "Stability curve" )
     plt.plot(x_cg, Sh_S_stab_SM0, label= "Stability curve (SM = 0)")
     plt.plot(x_cg, Sh_S_control, label= "Controllability curve")
-    plt.axvline(0.556)
-    plt.axvline(0.3616)
 
     if original_design:
         plt.plot(np.linspace(0,1,10), np.ones(10)*0.202, label= r"$\frac{S_h}{S}$ for the BAe Avro RJ85")
